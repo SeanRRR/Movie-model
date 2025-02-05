@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-
 # Define model (feed-forward, two hidden layers)
 # TODO: This is where most of the work will be done. You can change the model architecture,
 #       add more layers, change activation functions, etc.
