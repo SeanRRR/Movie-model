@@ -16,7 +16,7 @@ import torch
 # 'IMDB_Rating', 'Meta_score', 'No_of_Votes'
 def get_prepared_data(data_path="data"):
 
-    # Load raw data
+    # Load raw data pause
     # this function tries to combine all .csv files in the data folder
     # it matches them up using the "Series_Title" column
     # if you want to use additional datasets, make sure they have a "Series_Title" column
