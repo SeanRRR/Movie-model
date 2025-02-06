@@ -24,7 +24,6 @@ def get_prepared_data(data_path="data"):
     # do not rename the column by hand, add code before this point to rename it
     # remember: we will not manually modify your datasets, so your code must do any formatting automatically
     data = get_raw_data(data_path)
-
     # Drop columns in text format (not used in the demo, may be useful to you)
     data = data.drop(columns=["Poster_Link", "Series_Title", "Overview", "Director", "Star1", "Star2", "Star3", "Star4"])
 
@@ -36,14 +35,14 @@ def get_prepared_data(data_path="data"):
                                         if type(x) == str else x)
 
     # Convert categorical columns to one-hot encoding
-    data = pd.get_dummies(data)
-
+    data = pd.get_dummies(data, dtype=int)
+    print(data)
     # Define features and target
     features = data.drop(columns=["Gross"])
     target = data["Gross"]
-
     # Convert to numpy arrays
     features = np.array(features)
+
     target = np.array(target).reshape(-1, 1)
 
     # Convert to torch tensors

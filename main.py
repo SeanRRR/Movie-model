@@ -8,7 +8,6 @@ from tqdm import tqdm
 
 def final_cross_validation_test():
     print("Running 5-fold cross validation test...")
-
     from sklearn.model_selection import KFold, cross_val_score
     import torch
     import torch.nn as nn
