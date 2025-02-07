@@ -1,7 +1,6 @@
-#test test
-
 import pandas as pd
 import numpy as np
+import requests
 import torch
 import time
 
@@ -50,13 +49,23 @@ def get_prepared_data(data_path="data"):
     features = torch.tensor(features, dtype=torch.float32)
     target = torch.tensor(target, dtype=torch.float32)
 
+    test_budget = get_movie_budget("The Godfather", 1972)
+    print(test_budget)
+
+    # Adding the Budget column
+    df['Budget'] = df.apply(lambda row: get_movie_budget(row['Series_Title'], row['Released_Year']) if pd.notnull(row['Released_Year']) else None, axis=1)
+
+    # Save updated dataset
+    df.to_csv('data/imdb_top_1000.csv', index=False)
+
+    print("Dataset updated with budget information.")
+
     return features, target
 
 # Load dataset
-df = pd.read_csv('IMDB Top 1000.csv')
-
+df = pd.read_csv('data/imdb_top_1000.csv')
 # Your TMDB API key
-TMDB_API_KEY = 'YOUR_TMDB_API_KEY'
+TMDB_API_KEY = '1022c77fe927cff4f34f59e88869c4f7'
 
 # Base URL for TMDB search and movie details
 SEARCH_URL = "https://api.themoviedb.org/3/search/movie"
@@ -76,15 +85,6 @@ def get_movie_budget(title, year):
         details_response = requests.get(DETAILS_URL.format(movie_id), params={"api_key": TMDB_API_KEY}).json()
         return details_response.get("budget", None)
     return None
-
-# Adding the Budget column
-df['Budget'] = df.apply(lambda row: get_movie_budget(row['Series_Title'], row['Released_Year']) if pd.notnull(row['Released_Year']) else None, axis=1)
-
-# Save updated dataset
-df.to_csv('IMDB_Top_1000_with_Budget.csv', index=False)
-
-print("Dataset updated with budget information.")
-
 
 def get_all_titles(data_path="data"):
     data = get_raw_data(data_path)
