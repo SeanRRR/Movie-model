@@ -36,7 +36,6 @@ def get_prepared_data(data_path="data"):
 
     # Convert categorical columns to one-hot encoding
     data = pd.get_dummies(data, dtype=int)
-    print(data)
     # Define features and target
     features = data.drop(columns=["Gross"])
     target = data["Gross"]
@@ -54,9 +53,12 @@ def get_prepared_data(data_path="data"):
 
     # Adding the Budget column
     df['Budget'] = df.apply(lambda row: get_movie_budget(row['Series_Title'], row['Released_Year']) if pd.notnull(row['Released_Year']) else None, axis=1)
-
     # Save updated dataset
-    df.to_csv('data/imdb_top_1000.csv', index=False)
+
+    df.dropna()
+    df_filtered = df[df['Budget'] != 0]
+    print(df_filtered)
+    df_filtered.to_csv('data/imdb_top_1000.csv', index=False)
 
     print("Dataset updated with budget information.")
 
