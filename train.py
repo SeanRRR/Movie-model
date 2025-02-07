@@ -10,7 +10,6 @@ from prep_data import get_prepared_data
 # import model from model.py
 from model import create_model
 
-
 # TODO modify this function however you want to train the model
 def train_model(model, optimizer, criterion, X_train, y_train, X_val, y_val, training_updates=True):
 
