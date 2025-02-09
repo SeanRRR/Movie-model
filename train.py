@@ -24,7 +24,7 @@ def train_model(model, optimizer, criterion, X_train, y_train, X_val, y_val, tra
         return SklearnModelWrapper(model)  # Wrap so `main.py` can call model(X_test)
 
     # PyTorch Training Loop
-    num_epochs = 1000
+    num_epochs = 2000
     for epoch in range(num_epochs):
         optimizer.zero_grad()
         output = model(X_train)
