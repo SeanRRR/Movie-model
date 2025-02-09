@@ -23,7 +23,7 @@ def create_model(input_data):
     """Creates and returns a PyTorch gradient boosting model and an optimizer."""
     num_features = input_data.shape[1]
     model = GradientBoostingModel(num_features)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)  # You can adjust the learning rate
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.005)  # You can adjust the learning rate
     return model, optimizer
 
 def preprocess_data(df):
