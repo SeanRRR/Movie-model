@@ -8,10 +8,15 @@ import numpy as np
 class GradientBoostingModel(nn.Module):
     def __init__(self, input_dim):
         super(GradientBoostingModel, self).__init__()
-        self.fc = nn.Linear(input_dim, 1)
+        self.fc1 = nn.Linear(input_dim, 64)  # First hidden layer
+        self.fc2 = nn.Linear(64, 32)         # Second hidden layer
+        self.fc3 = nn.Linear(32, 1)          # Output layer
 
     def forward(self, x):
-        return self.fc(x)
+        x = torch.relu(self.fc1(x))  # Apply ReLU activation
+        x = torch.relu(self.fc2(x))  # Apply ReLU activation
+        x = self.fc3(x)              # Output without activation (for regression)
+        return x
 
 
 def create_model(input_data):
@@ -20,7 +25,6 @@ def create_model(input_data):
     model = GradientBoostingModel(num_features)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)  # You can adjust the learning rate
     return model, optimizer
-
 
 def preprocess_data(df):
     """Preprocesses the dataset: handles missing values, encodes categorical data, and scales numerical features."""
@@ -44,6 +48,10 @@ def preprocess_data(df):
     except ValueError as e:
         print(f"Data conversion error: {e}")
         return None
+
+    # Apply log transformation to handle skewness
+    df["Gross"] = np.log1p(df["Gross"])  # log(1 + Gross)
+    df["Budget"] = np.log1p(df["Budget"])  # log(1 + Budget)
 
     categorical_cols = ["Certificate", "Genre", "Director", "Star1", "Star2", "Star3", "Star4"]
     encoded_dfs = [pd.get_dummies(df[col], prefix=col) for col in categorical_cols]
