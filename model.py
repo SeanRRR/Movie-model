@@ -49,10 +49,6 @@ def preprocess_data(df):
         print(f"Data conversion error: {e}")
         return None
 
-    # Apply log transformation to handle skewness
-    df["Gross"] = np.log1p(df["Gross"])  # log(1 + Gross)
-    df["Budget"] = np.log1p(df["Budget"])  # log(1 + Budget)
-
     categorical_cols = ["Certificate", "Genre", "Director", "Star1", "Star2", "Star3", "Star4"]
     encoded_dfs = [pd.get_dummies(df[col], prefix=col) for col in categorical_cols]
     df = df.drop(columns=categorical_cols).reset_index(drop=True)
