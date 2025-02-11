@@ -2,62 +2,92 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import pandas as pd
-import numpy as np
 
 
-class GradientBoostingModel(nn.Module):
-    def __init__(self, input_dim):
-        super(GradientBoostingModel, self).__init__()
-        self.fc1 = nn.Linear(input_dim, 64)  # First hidden layer
-        self.fc2 = nn.Linear(64, 32)         # Second hidden layer
-        self.fc3 = nn.Linear(32, 1)          # Output layer
+class MyModel(nn.Module):
+    """A simple neural network for predicting movie revenue."""
+
+    def __init__(self, input_size):
+        super(MyModel, self).__init__()
+        self.fc1 = nn.Linear(input_size, 64)  # First layer with 64 neurons
+        self.fc2 = nn.Linear(64, 32)  # Second layer with 32 neurons
+        self.output_layer = nn.Linear(32, 1)  # Final output layer
+        self.dropout = nn.Dropout(0.2)  # Helps prevent overfitting
 
     def forward(self, x):
-        x = torch.relu(self.fc1(x))  # Apply ReLU activation
-        x = torch.relu(self.fc2(x))  # Apply ReLU activation
-        x = self.fc3(x)              # Output without activation (for regression)
-        return x
+        """Defines how the input flows through the network."""
+        x = torch.relu(self.fc1(x))
+        x = self.dropout(x)  # Apply dropout
+        x = torch.relu(self.fc2(x))
+        return self.output_layer(x)  # No activation for regression output
 
 
-def create_model(input_data):
-    """Creates and returns a PyTorch gradient boosting model and an optimizer."""
-    num_features = input_data.shape[1]
-    model = GradientBoostingModel(num_features)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.005)  # You can adjust the learning rate
+def create_model(data, lr=0.003):
+    """
+    Creates a model and optimizer.
+
+    Args:
+        data (pd.DataFrame): The input data.
+        lr (float): Learning rate.
+
+    Returns:
+        model, optimizer
+    """
+    feature_count = data.shape[1]
+    model = MyModel(feature_count)
+    optimizer = optim.Adam(model.parameters(), lr=lr)
     return model, optimizer
 
-def preprocess_data(df):
-    """Preprocesses the dataset: handles missing values, encodes categorical data, and scales numerical features."""
 
-    cols_to_keep = [
-        "Series_Title", "Released_Year", "Certificate", "Runtime", "Genre",
-        "IMDB_Rating", "Meta_score", "Director", "Star1", "Star2", "Star3",
-        "Star4", "No_of_Votes", "Gross", "Budget"
+def preprocess_movie_data(df):
+    """
+    Prepares movie data for training.
+
+    Args:
+        df (pd.DataFrame): Raw dataset.
+
+    Returns:
+        torch.Tensor, torch.Tensor: Processed features and target.
+    """
+
+    # Keeping only the relevant columns
+    cols_needed = [
+        "Released_Year", "IMDB_Rating", "Meta_score", "No_of_Votes",
+        "Gross", "Budget", "Runtime", "Certificate", "Genre",
+        "Director", "Star1", "Star2", "Star3", "Star4"
     ]
 
-    df = df[cols_to_keep].dropna()
+    df = df[cols_needed].copy()  # Make a copy to avoid modifying the original
 
-    try:
-        df["Released_Year"] = df["Released_Year"].astype(int)
-        df["IMDB_Rating"] = df["IMDB_Rating"].astype(float)
-        df["Meta_score"] = df["Meta_score"].astype(float)
-        df["No_of_Votes"] = df["No_of_Votes"].astype(int)
-        df["Gross"] = df["Gross"].replace({',': ''}, regex=True).astype(float)
-        df["Budget"] = df["Budget"].replace({',': ''}, regex=True).astype(float)
-        df["Runtime"] = df["Runtime"].str.replace(" min", "").astype(int)
-    except ValueError as e:
-        print(f"Data conversion error: {e}")
-        return None
+    # Filling missing values in numeric columns
+    numeric_cols = ["Released_Year", "IMDB_Rating", "Meta_score", "No_of_Votes", "Gross", "Budget", "Runtime"]
+    for col in numeric_cols:
+        df[col] = df[col].fillna(df[col].mean())  # Fill NaNs with mean values
 
+    # Convert numerical columns to proper types
+    df["Released_Year"] = df["Released_Year"].astype(int)
+    df["IMDB_Rating"] = df["IMDB_Rating"].astype(float)
+    df["Meta_score"] = df["Meta_score"].astype(float)
+    df["No_of_Votes"] = df["No_of_Votes"].astype(int)
+
+    # Some budget and gross values have commas, need to clean them
+    df["Gross"] = df["Gross"].astype(str).str.replace(",", "").astype(float)
+    df["Budget"] = df["Budget"].astype(str).str.replace(",", "").astype(float)
+
+    # One-hot encoding for categorical features
     categorical_cols = ["Certificate", "Genre", "Director", "Star1", "Star2", "Star3", "Star4"]
-    encoded_dfs = [pd.get_dummies(df[col], prefix=col) for col in categorical_cols]
-    df = df.drop(columns=categorical_cols).reset_index(drop=True)
-    df = pd.concat([df] + encoded_dfs, axis=1)
+    df = pd.get_dummies(df, columns=categorical_cols)
 
-    numerical_cols = ["Released_Year", "IMDB_Rating", "Meta_score", "No_of_Votes", "Gross", "Budget", "Runtime"]
-    df[numerical_cols] = (df[numerical_cols] - df[numerical_cols].mean()) / df[numerical_cols].std()
+    # Normalize numerical values
+    for col in numeric_cols:
+        df[col] = (df[col] - df[col].mean()) / df[col].std()  # Standardization
 
-    X = torch.tensor(df.drop(columns=["Gross"]).values, dtype=torch.float32)
-    y = torch.tensor(df["Gross"].values, dtype=torch.float32).view(-1, 1)
+    # Separate target variable
+    y = df["Gross"]
+    X = df.drop(columns=["Gross"])
 
-    return X, y
+    # Convert to PyTorch tensors
+    X_tensor = torch.tensor(X.values, dtype=torch.float32)
+    y_tensor = torch.tensor(y.values, dtype=torch.float32).view(-1, 1)  # Reshape for PyTorch
+
+    return X_tensor, y_tensor
