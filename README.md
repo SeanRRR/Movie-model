@@ -1,7 +1,7 @@
 # Kylan, Reed, and Sean's Github for the GDG Mini-ML Competition
 
 ## Description
-This repository contains various Python files related to our model.
+This project aims to predict the all-time domestic (US/CA) box office earnings ("Gross" column) for the top 1000 movies on IMDB using the Kaggle IMDB Movies Dataset. We had seven days to achieve the lowest cross-validation error.
 
-### Our repository contains an additional file
-- `EmptyRow.py' - which deleted any empty rows.
+### Model Details
+
