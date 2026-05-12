@@ -1,7 +1,23 @@
-# Kylan, Reed, and Sean's Github for the GDG Mini-ML Competition
+# IMDB Box Office Predictor, GDG Mini-ML Competition
 
-## Description
-This project aims to predict the all-time domestic (US/CA) box office earnings ("Gross" column) for the top 1000 movies on IMDB using the Kaggle IMDB Movies Dataset. We had seven days to achieve the lowest cross-validation error.
+### Description
+Predicts US/CA box office earnings for the top 1000 IMDB movies using a PyTorch MLP. Built in 7 days for the GDG Mini-ML Competition — achieved R² of 60.4% via 5-fold cross-validation.
+
+### Tech Stack
+* **Language:** Python
+* **Framework:** PyTorch
+* **Data Science:** Pandas, NumPy, Scikit-learn
+* **Version Control:** Git
 
 ### Model Details
+Architecture: Multi-Layer Perceptron (MLP)
+* **Layer 1:** 64 neurons (ReLU)
+* **Dropout:** 0.2 (to prevent overfitting within a small dataset N = 1000)
+* **Layer 2:** 32 neurons (ReLU)
+* **Output:** 1 neuron (Linear)
 
+Preprocessing: We performed One-Hot Encoding on categorical features (Genre, Director, Stars) and Standardization (scaling to mean=0, std=1) on numerical features like Budget and Runtime. Missing values were handled by filling them with the mean of the column.
+
+Training Strategy: Trained using the Adam Optimizer with a learning rate of 0.003 and Mean Squared Error (MSE) as the loss function.
+
+Cross-Validation: 5-fold cross-validation yielded an average R² Score of 60.4%.
