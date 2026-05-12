@@ -21,3 +21,15 @@ Preprocessing: We performed One-Hot Encoding on categorical features (Genre, Dir
 Training Strategy: Trained using the Adam Optimizer with a learning rate of 0.003 and Mean Squared Error (MSE) as the loss function.
 
 Cross-Validation: 5-fold cross-validation yielded an average R² Score of 60.4%.
+
+### How to Run
+```bash
+# Install dependencies
+pip install torch pandas numpy scikit-learn
+
+# Data preprocessing
+python prep_data.py
+
+# Execution and validation
+python main.py
+```
