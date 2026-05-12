@@ -1,7 +1,7 @@
 # IMDB Box Office Predictor, GDG Mini-ML Competition
 
 ### Description
-Predicts US/CA box office earnings for the top 1000 IMDB movies using a PyTorch MLP. Built in 7 days for the GDG Mini-ML Competition — achieved R² of 60.4% via 5-fold cross-validation.
+Predicts US/CA box office earnings for the top 1000 IMDB movies using a PyTorch MLP. Built in 7 days for the GDG Mini-ML Competition — achieved R² of 60.4% via 5-fold cross-validation. Won third place!
 
 ### Tech Stack
 * **Language:** Python
